@@ -14,7 +14,7 @@ import (
 
 func main() {
 	var TOKEN string
-	fmt.Println("Enter your token here: ")
+	fmt.Print("Enter your token here: ")
 	fmt.Scan(&TOKEN)
 
 	discord, err := discordgo.New("Bot " + TOKEN)
