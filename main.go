@@ -6,16 +6,25 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/joho/godotenv"
 )
 
+const BotPrefix = "!gobot"
+
+func init() {
+	// loads values from .env into the system
+	if err := godotenv.Load(); err != nil {
+		log.Print("No .env file found")
+	}
+}
+
 func main() {
-	var TOKEN string
-	fmt.Println("Enter your token here: ")
-	fmt.Scan(&TOKEN)
+	var TOKEN string = os.Getenv("BOT_TOKEN")
 
 	discord, err := discordgo.New("Bot " + TOKEN)
 	if err != nil {
@@ -51,7 +60,12 @@ func hello(sess *discordgo.Session, msg *discordgo.MessageCreate) {
 		return
 	}
 
-	if msg.Content == "hello" {
+	args := strings.Split(msg.Content, " ")
+	if args[0] != BotPrefix {
+		return
+	}
+
+	if strings.Join(args[1:], " ") == "hello" {
 		sess.ChannelMessageSend(msg.ChannelID, "Hi, "+msg.Author.Username)
 	}
 }
@@ -61,7 +75,12 @@ func flipCoin(sess *discordgo.Session, msg *discordgo.MessageCreate) {
 		return
 	}
 
-	if msg.Content == "flip coin" {
+	args := strings.Split(msg.Content, " ")
+	if args[0] != BotPrefix {
+		return
+	}
+
+	if strings.Join(args[1:], " ") == "flip coin" {
 		r := rand.New(rand.NewSource(time.Now().UnixNano()))
 		res := r.Intn(2)
 		if res == 0 {
@@ -77,7 +96,12 @@ func rollDice(sess *discordgo.Session, msg *discordgo.MessageCreate) {
 		return
 	}
 
-	if msg.Content == "roll dice" {
+	args := strings.Split(msg.Content, " ")
+	if args[0] != BotPrefix {
+		return
+	}
+
+	if strings.Join(args[1:], " ") == "roll dice" {
 		r := rand.New(rand.NewSource(time.Now().UnixNano()))
 		res := r.Intn(6) + 1
 		sess.ChannelMessageSend(msg.ChannelID, msg.Author.Username+" rolled "+fmt.Sprint(res))
